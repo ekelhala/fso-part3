@@ -40,6 +40,18 @@ app.get('/api/persons/:id', (request, response) => {
     }
 })
 
+app.delete('/api/persons/:id', (request, response) => {
+    const id = Number(request.params.id)
+    contactIndex = contacts.findIndex(contact =>  contact.id === id)
+    if(contactIndex === -1) {
+        response.status(404).send('Invalid person id')
+    }
+    else {
+        contacts.splice(contactIndex,1)
+        response.status(204).send()
+    }
+})
+
 app.get('/info', (request,response) => {
     const now = new Date()
     const amount = contacts.length

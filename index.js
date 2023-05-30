@@ -29,6 +29,24 @@ app.get('/api/persons',(request, response) => {
     response.json(contacts)
 })
 
+app.get('/api/persons/:id', (request, response) => {
+    const id = Number(request.params.id)
+    const contact = contacts.find(person => person.id === id)
+    if(contact) {
+        response.json(contact)
+    }
+    else {
+        response.status(404).send('Invalid person id')
+    }
+})
+
+app.get('/info', (request,response) => {
+    const now = new Date()
+    const amount = contacts.length
+    const responseHtml = `<p>There is ${amount} entries in phonebook<br/>${now}</p>`
+    response.send(responseHtml)
+})
+
 app.listen(PORT, () => {
     console.log(`Server up and running on port ${PORT}`)
 })

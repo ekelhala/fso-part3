@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "copy": "@powershell Copy-Item .\/.gitignore,.\/index.js,.\/package-lock.json,.\/package.json -Destination '../../fullstack_open/part3' -Force"
+    "copy": "@powershell Copy-Item -Path (Get-Item -Path .\/* -Exclude ('requests','node_modules','.git')).FullName -Destination '../../fullstack_open/part3' -Force"
   },
   "author": "Emil Kelhälä",
   "license": "ISC",

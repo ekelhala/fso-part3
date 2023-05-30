@@ -25,6 +25,8 @@ const contacts = [
     }
 ]
 
+app.use(express.json())
+
 app.get('/api/persons',(request, response) => {
     response.json(contacts)
 })
@@ -52,6 +54,25 @@ app.delete('/api/persons/:id', (request, response) => {
     }
 })
 
+app.post('/api/persons', (request, response) => {
+    let id = 0
+    do {
+        id = generateID()
+    } while(contacts.find(person => person.id === id))
+    const addPerson = request.body
+    addPerson.id = id
+    if(!addPerson.name || !addPerson.number) {
+        response.status(400).json({error: 'Name and number must be specified'})
+    }
+    else if(contacts.find(person => person.name === addPerson.name)) {
+        response.status(400).json({error: 'Name must be unique'})
+    }
+    else {
+        contacts.push(addPerson)
+        response.status(201).send('Entry created')
+    }
+})
+
 app.get('/info', (request,response) => {
     const now = new Date()
     const amount = contacts.length
@@ -62,3 +83,5 @@ app.get('/info', (request,response) => {
 app.listen(PORT, () => {
     console.log(`Server up and running on port ${PORT}`)
 })
+
+const generateID = () => Math.floor(Math.random() * 10000)

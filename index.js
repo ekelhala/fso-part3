@@ -1,8 +1,9 @@
 const express = require('express')
 const morgan = require('morgan')
+const cors = require('cors')
 
 const app = express()
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 const contacts = [
     { 
       "id": 1,
@@ -35,6 +36,8 @@ morgan.token('request', (req) => {
 
 app.use(express.json())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :request'))
+app.use(cors())
+app.use(express.static('build'))
 
 app.get('/api/persons',(request, response) => {
     response.json(contacts)

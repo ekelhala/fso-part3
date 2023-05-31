@@ -7,11 +7,13 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "copy": "@powershell Copy-Item -Path (Get-Item -Path .\/* -Exclude ('requests','node_modules','.git')).FullName -Destination '../../fullstack_open/part3' -Force"
+    "copy-to-answers": "@powershell Copy-Item -Path (Get-Item -Path ./* -Exclude ('requests','node_modules','.git','build')).FullName -Force -Destination ../../fullstack_open/part3/phonebook-backend",
+    "build:ui": "@powershell Remove-Item -Recurse -Force build && cd ../../fullstack_open/part3/phonebook && npm run build && @powershell Copy-Item build -Recurse ../../../fullstack_open_standalones/part3"
   },
   "author": "Emil Kelhälä",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.18.2",
     "morgan": "^1.10.0"
   },

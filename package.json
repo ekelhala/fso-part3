@@ -9,7 +9,7 @@
     "dev": "nodemon index.js",
     "copy-to-answers": "@powershell Copy-Item -Path (Get-Item -Path ./* -Exclude ('requests','node_modules','.git','build')).FullName -Force -Destination ../../fullstack_open/part3/phonebook-backend",
     "build:ui": "@powershell Remove-Item -Recurse -Force build && cd ../../fullstack_open/part3/phonebook && npm run build && @powershell Copy-Item build -Recurse ../../../fullstack_open_standalones/part3",
-    "deploy": "npm run build:ui && git add . && git commit -m deploy && git push"
+    "deploy": "npm run build:ui && git add . && git commit -m \"deploy\" && git push"
   
   },
   "author": "Emil Kelhälä",

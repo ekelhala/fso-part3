@@ -47,27 +47,16 @@ app.get('/api/persons',(request, response) => {
     })
 })
 
-app.get('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const contact = contacts.find(person => person.id === id)
-    if(contact) {
-        response.json(contact)
-    }
-    else {
-        response.status(404).send('Invalid person id')
-    }
+app.get('/api/persons/:id', (request, response, next) => {
+    Person.findById(request.params.id)
+        .then(result => response.json(result))
+        .catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    contactIndex = contacts.findIndex(contact =>  contact.id === id)
-    if(contactIndex === -1) {
-        response.status(404).send('Invalid person id')
-    }
-    else {
-        contacts.splice(contactIndex,1)
-        response.status(204).send()
-    }
+app.delete('/api/persons/:id', (request, response, next) => {
+    Person.findByIdAndRemove(request.params.id)
+        .then(result => response.status(204).send())
+        .catch(error => next(error))
 })
 
 app.post('/api/persons', (request, response) => {
@@ -86,15 +75,44 @@ app.post('/api/persons', (request, response) => {
     }
 })
 
-app.get('/info', (request,response) => {
-    const now = new Date()
-    const amount = contacts.length
-    const responseHtml = `<p>There is ${amount} entries in phonebook<br/>${now}</p>`
-    response.send(responseHtml)
+app.put('/api/persons/:id', (request, response, next) => {
+    const body = request.body
+    if(!body.name || !body.number) {
+        response.status(400).json({error: 'Name and number must be specified'})
+    }
+    else {
+        const person = {
+            name: body.name,
+            number: body.number
+        }
+        Person.findByIdAndUpdate(request.params.id, person)
+            .then(result => response.status(204).send())
+            .catch(error => next(error))
+    }
 })
+
+app.get('/info', (request,response) => {
+    Person.estimatedDocumentCount()
+        .then(amount => {
+            const now = new Date()
+            const responseHtml = `<p>There is ${amount} entries in phonebook<br/>${now}</p>`
+            response.send(responseHtml)
+        })
+})
+
+//Error handling
+const errorHandler = (error, request, response, next) => {
+    if(error.name === 'CastError') {
+        return response.status(400).send({error: 'Invalid id'})
+    }
+    next(error)
+}
+const unknownEndpoint = (request,response) => {
+    response.status(404).send({error: 'Unknown endpoint'})
+}
+app.use(unknownEndpoint)
+app.use(errorHandler)
 
 app.listen(PORT, () => {
     console.log(`Server up and running on port ${PORT}`)
 })
-
-const generateID = () => Math.floor(Math.random() * 10000)

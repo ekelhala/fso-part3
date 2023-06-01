@@ -1,6 +1,8 @@
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+require('dotenv').config()
+const Person = require('./models/Person')
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -40,7 +42,9 @@ app.use(cors())
 app.use(express.static('build'))
 
 app.get('/api/persons',(request, response) => {
-    response.json(contacts)
+    Person.find({}).then(result => {
+        response.json(result)
+    })
 })
 
 app.get('/api/persons/:id', (request, response) => {
@@ -67,21 +71,18 @@ app.delete('/api/persons/:id', (request, response) => {
 })
 
 app.post('/api/persons', (request, response) => {
-    let id = 0
-    do {
-        id = generateID()
-    } while(contacts.find(person => person.id === id))
-    const addPerson = request.body
-    addPerson.id = id
-    if(!addPerson.name || !addPerson.number) {
+    const body = request.body
+    if(!body.name || !body.number) {
         response.status(400).json({error: 'Name and number must be specified'})
     }
-    else if(contacts.find(person => person.name === addPerson.name)) {
-        response.status(400).json({error: 'Name must be unique'})
-    }
     else {
-        contacts.push(addPerson)
-        response.status(201).send('Entry created')
+        const addPerson = new Person({
+            name: body.name,
+            number: body.number
+        })
+        addPerson.save().then(result => {
+            response.status(201).send('Entry created')
+        })
     }
 })
 
